@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>RaceRadar — Never miss a running ballot</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --surface:#ffffff; --surface-2:#f1f3f8;
+    --ink:#0f172a; --ink-soft:#475569; --ink-faint:#94a3b8;
+    --line:#e5e8ef; --brand:#f5533d; --brand-ink:#c62b16;
+    --accent:#2563eb; --gold:#b7892b;
+    --ok:#16a34a; --warn:#d97706; --live:#e11d48;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+    --radius:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1020; --surface:#131a2e; --surface-2:#1b2440;
+      --ink:#eef2ff; --ink-soft:#aeb8d4; --ink-faint:#6b7699;
+      --line:#26304d; --brand:#ff6a55; --brand-ink:#ff8a78;
+      --accent:#6ea0ff; --gold:#e2b755;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%}
+  button{font:inherit;cursor:pointer}
+  a{color:var(--accent)}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:40;
+    background:color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter:saturate(160%) blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em;font-size:19px}
+  .logo .dot{
+    width:26px;height:26px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-ink));
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 22%,transparent);
+    position:relative;flex:0 0 auto;
+  }
+  .logo .dot::after{content:"";position:absolute;inset:7px;border-radius:50%;border:2px solid #fff;opacity:.85}
+  .logo small{color:var(--ink-faint);font-weight:600;font-size:11px;display:block;letter-spacing:.02em}
+  .spacer{flex:1}
+  .loc-btn{
+    display:flex;align-items:center;gap:7px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:600;font-size:13px;
+  }
+  .loc-btn b{color:var(--brand-ink)}
+  .pro-btn{
+    border:none;border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;color:#fff;
+    background:linear-gradient(135deg,var(--brand),var(--brand-ink));
+  }
+  .icon-btn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:8px 11px;font-weight:600;font-size:13px}
+
+  /* ---------- Hero / search ---------- */
+  .hero{max-width:1080px;margin:0 auto;padding:22px 16px 6px}
+  .hero h1{font-size:26px;line-height:1.15;letter-spacing:-.03em;margin:0 0 6px}
+  .hero p{margin:0 0 16px;color:var(--ink-soft);max-width:60ch}
+  .search{
+    display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+    border-radius:14px;padding:11px 14px;box-shadow:var(--shadow);
+  }
+  .search svg{flex:0 0 auto;color:var(--ink-faint)}
+  .search input{border:none;background:none;color:var(--ink);font-size:16px;width:100%;outline:none}
+  .search input::placeholder{color:var(--ink-faint)}
+
+  /* ---------- Category rail ---------- */
+  .rail{max-width:1080px;margin:16px auto 0;padding:0 16px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .cat{
+    flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:14px;
+    padding:12px 14px;min-width:132px;text-align:left;transition:.15s;color:var(--ink);
+  }
+  .cat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .cat.on{border-color:var(--brand);box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 30%,transparent)}
+  .cat .emoji{font-size:20px}
+  .cat .t{font-weight:700;margin-top:6px;font-size:14px;letter-spacing:-.01em}
+  .cat .n{color:var(--ink-faint);font-size:12px;font-weight:600}
+
+  /* ---------- Filter chips ---------- */
+  .filters{max-width:1080px;margin:16px auto 0;padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{
+    border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);
+    border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;transition:.12s;
+  }
+  .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .chip.tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .count{margin-left:auto;color:var(--ink-faint);font-size:13px;font-weight:600}
+  select.sort{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+
+  /* ---------- Grid ---------- */
+  main{max-width:1080px;margin:0 auto;padding:18px 16px 90px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:.15s;
+  }
+  .card:hover{transform:translateY(-3px)}
+  .banner{height:96px;position:relative;display:flex;align-items:flex-end;padding:10px;color:#fff}
+  .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.45))}
+  .banner .flag{position:absolute;top:10px;left:10px;font-size:22px;z-index:2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+  .banner .maj{position:absolute;top:11px;right:10px;z-index:2;background:rgba(255,255,255,.9);color:#111;font-size:10px;font-weight:800;letter-spacing:.04em;padding:3px 7px;border-radius:999px}
+  .banner h3{position:relative;z-index:2;margin:0;font-size:17px;letter-spacing:-.01em;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .body{padding:13px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .where{color:var(--ink-soft);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;width:fit-content}
+  .s-open{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+  .s-soon{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+  .s-closed{background:var(--surface-2);color:var(--ink-faint)}
+  .s-live{background:color-mix(in srgb,var(--live) 15%,transparent);color:var(--live)}
+  .pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:p 1.4s infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+  .meta{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;font-weight:700;color:var(--ink-soft);background:var(--surface-2);border-radius:8px;padding:3px 8px}
+  .deadline{font-size:13px;font-weight:700;margin-top:auto;padding-top:8px;border-top:1px dashed var(--line);color:var(--ink)}
+  .deadline b{color:var(--brand-ink)}
+  .row{display:flex;gap:8px;align-items:center}
+  .watch{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 10px;font-weight:700;font-size:13px;flex:0 0 auto}
+  .watch.on{background:color-mix(in srgb,var(--brand) 14%,transparent);border-color:var(--brand);color:var(--brand-ink)}
+  .details{flex:1;border:none;background:var(--ink);color:var(--bg);border-radius:10px;padding:8px 10px;font-weight:700;font-size:13px}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--ink-faint)}
+  .empty .big{font-size:40px}
+
+  /* ---------- Modal ---------- */
+  .modal{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center}
+  .modal.show{display:flex}
+  .scrim{position:absolute;inset:0;background:rgba(2,6,23,.55);backdrop-filter:blur(2px)}
+  .sheet{
+    position:relative;background:var(--surface);width:100%;max-width:560px;max-height:92vh;overflow:auto;
+    border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:up .25s ease;
+  }
+  @media(min-width:600px){.modal{align-items:center}.sheet{border-radius:22px}}
+  @keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .m-banner{height:130px;position:relative;display:flex;align-items:flex-end;padding:16px;color:#fff}
+  .m-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.55))}
+  .m-banner h2{position:relative;z-index:2;margin:0;font-size:24px;letter-spacing:-.02em;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .m-close{position:absolute;top:12px;right:12px;z-index:3;border:none;background:rgba(0,0,0,.35);color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px}
+  .m-body{padding:18px}
+  .m-body h4{margin:18px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fact{background:var(--surface-2);border-radius:12px;padding:11px}
+  .fact .k{font-size:11px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .fact .v{font-size:15px;font-weight:700;margin-top:3px}
+  .steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+  .steps li{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border-radius:12px;padding:11px}
+  .steps .num{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+  .locked{position:relative;border:1px dashed var(--brand);border-radius:14px;padding:16px;background:color-mix(in srgb,var(--brand) 6%,transparent);text-align:center}
+  .locked .lk{font-size:26px}
+  .locked h5{margin:6px 0 4px;font-size:15px}
+  .locked p{margin:0 0 12px;color:var(--ink-soft);font-size:13px}
+  .blurred{filter:blur(5px);user-select:none;pointer-events:none;opacity:.6}
+  .cta{border:none;border-radius:12px;padding:11px 16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-ink))}
+  .link-out{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-weight:700}
+
+  /* ---------- Location + Pro dialogs (shared) ---------- */
+  .dlg{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+  .dlg.show{display:flex}
+  .dlg .box{position:relative;background:var(--surface);border-radius:20px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow);animation:up .2s ease}
+  .dlg h3{margin:0 0 4px;font-size:20px;letter-spacing:-.01em}
+  .dlg p{margin:0 0 16px;color:var(--ink-soft);font-size:14px}
+  .field{display:block;margin-bottom:12px}
+  .field span{display:block;font-size:12px;font-weight:700;color:var(--ink-faint);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+  .field select,.field input{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;padding:11px 12px;font-size:15px}
+  .dlg .save{width:100%;border:none;border-radius:12px;padding:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-ink));margin-top:4px}
+  .dlg .x{position:absolute;top:12px;right:12px;border:none;background:var(--surface-2);color:var(--ink);width:32px;height:32px;border-radius:50%;font-size:16px}
+  .plan{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .plan.best{border-color:var(--brand);box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 25%,transparent)}
+  .plan .pt{display:flex;justify-content:space-between;align-items:baseline}
+  .plan .pt b{font-size:16px}
+  .plan .pt .price{font-weight:800;color:var(--brand-ink)}
+  .plan ul{margin:8px 0 0;padding-left:18px;color:var(--ink-soft);font-size:13px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:90;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .note{max-width:1080px;margin:0 auto;padding:0 16px 30px;color:var(--ink-faint);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="logo">
+      <span class="dot"></span>
+      <span>RaceRadar<small>ballots · openings · majors</small></span>
+    </div>
+    <div class="spacer"></div>
+    <button class="loc-btn" id="locBtn" title="Set your home location">📍 <span id="locLabel">Set home</span></button>
+    <button class="icon-btn" id="watchTab" title="Your watchlist">☆ <span id="watchCount">0</span></button>
+    <button class="pro-btn" id="proBtn">✦ Go Pro</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Never miss a running ballot again.</h1>
+  <p id="heroSub">Track ballots and openings for the world's biggest races — from the Majors to the Seven Continents. Set your home location to see what's near you, or explore anywhere.</p>
+  <div class="search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" type="search" placeholder="Search a race, city or country — e.g. Berlin, Japan, ultra…">
+  </div>
+</section>
+
+<div class="rail" id="rail"></div>
+
+<div class="filters">
+  <button class="chip tab on" data-tab="all">All</button>
+  <button class="chip tab" data-tab="near">Near me</button>
+  <button class="chip tab" data-tab="ballot">Ballot entry</button>
+  <button class="chip tab" data-tab="open">Open now</button>
+  <button class="chip tab" data-tab="watch">Watchlist</button>
+  <select class="sort" id="sort">
+    <option value="deadline">Sort: Closing soonest</option>
+    <option value="date">Sort: Race date</option>
+    <option value="name">Sort: Name A–Z</option>
+  </select>
+  <span class="count" id="count"></span>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <div class="big">🔍</div>
+    <p>No races match yet.<br>Try clearing a filter or searching a different place.</p>
+  </div>
+</main>
+
+<p class="note">
+  Prototype — event data below is illustrative sample data for demonstration. A live version would sync real ballot windows from official race sources.
+</p>
+
+<!-- Event detail modal -->
+<div class="modal" id="modal">
+  <div class="scrim" data-close></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<!-- Location dialog -->
+<div class="dlg" id="locDlg">
+  <div class="box">
+    <button class="x" data-close>×</button>
+    <h3>Your home base</h3>
+    <p>We'll highlight races near you and remind you before ballots close.</p>
+    <label class="field"><span>Country</span>
+      <select id="homeCountry"></select>
+    </label>
+    <label class="field"><span>Also interested in</span>
+      <select id="homeInterest"></select>
+    </label>
+    <button class="save" id="saveLoc">Save location</button>
+  </div>
+</div>
+
+<!-- Pro dialog -->
+<div class="dlg" id="proDlg">
+  <div class="box">
+    <button class="x" data-close>×</button>
+    <h3>RaceRadar Pro ✦</h3>
+    <p>Everything free, plus the edge to actually get in.</p>
+    <div class="plan best">
+      <div class="pt"><b>Pro Yearly</b><span class="price">$29/yr</span></div>
+      <ul>
+        <li>Instant ballot-open push alerts (before they sell out)</li>
+        <li>Acceptance odds & historical ballot success rates</li>
+        <li>Good-for-Age & qualifying-time planner</li>
+        <li>Charity & guaranteed-entry routes for every Major</li>
+        <li>Unlimited watchlist + travel/logistics briefings</li>
+      </ul>
+    </div>
+    <div class="plan">
+      <div class="pt"><b>Pro Monthly</b><span class="price">$3.99/mo</span></div>
+      <ul><li>All Pro features, billed monthly</li></ul>
+    </div>
+    <button class="save" id="startPro">Start 14-day free trial</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Sample data (illustrative) ============ */
+const CATEGORIES = [
+  {id:"major",   emoji:"🏅", name:"World Majors"},
+  {id:"europe",  emoji:"🇪🇺", name:"European"},
+  {id:"seven",   emoji:"🌍", name:"Seven Continents"},
+  {id:"disney",  emoji:"🏰", name:"Disney Races"},
+  {id:"trail",   emoji:"⛰️", name:"Trail & Ultra"},
+  {id:"iconic",  emoji:"✨", name:"Iconic City"},
+];
+
+// status: open | soon | closed | live
+const EVENTS = [
+  {id:"lon", name:"London Marathon", city:"London", country:"United Kingdom", flag:"🇬🇧", region:"Europe",
+   cats:["major","europe"], major:"MAJOR", dist:"Marathon", date:"2026-04-26",
+   method:"Ballot", status:"closed", ballotOpen:"2026-04-27", ballotClose:"2026-05-03", result:"2026-07",
+   price:"£69.99", grad:"linear-gradient(135deg,#e11d48,#7c1d3f)",
+   facts:{Field:"~56,000",Weather:"9–14°C, mild",Course:"Flat, fast, PB-friendly",Success:"~4% ballot odds"},
+   blurb:"The world's largest marathon and the hardest Major ballot to win. Post-race ballot for the following year opens the week after race day.",
+   steps:["Enter the public ballot the week after race day","Or secure a charity place (~£2,000 fundraising)","Good-for-Age & Championship entries for fast times","Result emails ~10 weeks later"]},
+
+  {id:"ber", name:"Berlin Marathon", city:"Berlin", country:"Germany", flag:"🇩🇪", region:"Europe",
+   cats:["major","europe"], major:"MAJOR", dist:"Marathon", date:"2026-09-27",
+   method:"Ballot", status:"soon", ballotOpen:"2025-10-15", ballotClose:"2025-10-29", result:"2026-01",
+   price:"€198", grad:"linear-gradient(135deg,#f59e0b,#b45309)",
+   facts:{Field:"~55,000",Weather:"12–18°C, cool",Course:"Flattest Major — WR course",Success:"~15% ballot odds"},
+   blurb:"The fastest marathon course on earth and home to the world record. The ballot is your best-value shot at a Major.",
+   steps:["Register for the ballot (mid-October)","Draw held late October","Guaranteed entry via sub-2:45 (M)/3:00 (F) times","Travel & charity slots also available"]},
+
+  {id:"bos", name:"Boston Marathon", city:"Boston", country:"United States", flag:"🇺🇸", region:"North America",
+   cats:["major"], major:"MAJOR", dist:"Marathon", date:"2026-04-20",
+   method:"Qualification", status:"closed", ballotOpen:"2025-09-08", ballotClose:"2025-09-12", result:"2025-09",
+   price:"$250", grad:"linear-gradient(135deg,#1d4ed8,#1e3a8a)",
+   facts:{Field:"~30,000",Weather:"7–13°C",Course:"Net downhill, tough hills",Success:"Time-qualified only"},
+   blurb:"The oldest annual marathon — no ballot. You earn your place with a qualifying time (currently getting faster each year).",
+   steps:["Run a certified qualifying time","Register during the September window","Fastest qualifiers get priority","Charity bibs are the non-qualifying route"]},
+
+  {id:"chi", name:"Chicago Marathon", city:"Chicago", country:"United States", flag:"🇺🇸", region:"North America",
+   cats:["major"], major:"MAJOR", dist:"Marathon", date:"2026-10-11",
+   method:"Ballot", status:"open", ballotOpen:"2025-10-28", ballotClose:"2025-11-20", result:"2025-12",
+   price:"$255", grad:"linear-gradient(135deg,#0ea5e9,#0369a1)",
+   facts:{Field:"~52,000",Weather:"5–13°C",Course:"Flat & fast, loop course",Success:"~25% drawing odds"},
+   blurb:"A flat, spectator-packed Major with a friendly drawing. Time-qualification and guaranteed-entry options exist too.",
+   steps:["Enter the drawing (late Oct–Nov)","Non-guaranteed applicants drawn in December","Guaranteed via time standard or legacy status","Charity and tour operator places available"]},
+
+  {id:"nyc", name:"New York City Marathon", city:"New York", country:"United States", flag:"🇺🇸", region:"North America",
+   cats:["major","seven"], major:"MAJOR", dist:"Marathon", date:"2026-11-01",
+   method:"Ballot", status:"closed", ballotOpen:"2026-02-01", ballotClose:"2026-02-28", result:"2026-03",
+   price:"$315", grad:"linear-gradient(135deg,#6366f1,#3730a3)",
+   facts:{Field:"~55,000",Weather:"6–12°C",Course:"Five boroughs, rolling bridges",Success:"~3% drawing odds"},
+   blurb:"The biggest marathon in the US and a bucket-list Major. Drawing opens early in the year; 9+1 NYRR route guarantees entry.",
+   steps:["Enter the drawing (February)","Or complete NYRR 9+1 for guaranteed entry","Time-qualify with fast standards","Charity & international tour packages"]},
+
+  {id:"tok", name:"Tokyo Marathon", city:"Tokyo", country:"Japan", flag:"🇯🇵", region:"Asia",
+   cats:["major","seven"], major:"MAJOR", dist:"Marathon", date:"2026-03-01",
+   method:"Ballot", status:"closed", ballotOpen:"2025-08-15", ballotClose:"2025-08-31", result:"2025-09",
+   price:"¥26,000", grad:"linear-gradient(135deg,#ef4444,#991b1b)",
+   facts:{Field:"~38,000",Weather:"6–12°C",Course:"Flat, scenic, superb support",Success:"~10% ballot odds"},
+   blurb:"The most orderly Major, run through the heart of Tokyo. Ballot opens in August; premium 'RUN as ONE' options guarantee a place.",
+   steps:["Enter the ballot (August)","Draw results in September","Charity & premium guaranteed entries","One-time 'Run with Heart' donation route"]},
+
+  {id:"syd", name:"Sydney Marathon", city:"Sydney", country:"Australia", flag:"🇦🇺", region:"Oceania",
+   cats:["major","seven"], major:"MAJOR", dist:"Marathon", date:"2026-08-30",
+   method:"General", status:"open", ballotOpen:"2025-09-01", ballotClose:"2026-07-01", result:"—",
+   price:"A$225", grad:"linear-gradient(135deg,#14b8a6,#0f766e)",
+   facts:{Field:"~35,000",Weather:"11–19°C",Course:"Harbour Bridge to Opera House",Success:"First-come entry"},
+   blurb:"The newest Abbott World Marathon Major — for now still general entry, so grab a place before it moves to a ballot.",
+   steps:["Register directly — no ballot yet","Places sell out earlier each year","Also counts toward Oceania continent","Book Harbour-side stay early"]},
+
+  {id:"cap", name:"Cape Town Marathon", city:"Cape Town", country:"South Africa", flag:"🇿🇦", region:"Africa",
+   cats:["seven","iconic"], major:"", dist:"Marathon", date:"2026-10-18",
+   method:"General", status:"open", ballotOpen:"2026-01-15", ballotClose:"2026-09-01", result:"—",
+   price:"R850", grad:"linear-gradient(135deg,#f97316,#c2410c)",
+   facts:{Field:"~22,000",Weather:"10–20°C",Course:"Flat, Table Mountain views",Success:"General entry"},
+   blurb:"Africa's premier flat marathon and a Seven Continents favourite. A candidate for future Major status.",
+   steps:["Register online — general entry","Add-on hospitality & tours","Ticks the Africa continent box","Pair with a safari week"]},
+
+  {id:"ant", name:"Antarctic Ice Marathon", city:"Union Glacier", country:"Antarctica", flag:"🇦🇶", region:"Antarctica",
+   cats:["seven","trail"], major:"", dist:"Marathon", date:"2026-12-13",
+   method:"General", status:"soon", ballotOpen:"2026-01-01", ballotClose:"2026-11-01", result:"—",
+   price:"€21,500", grad:"linear-gradient(135deg,#38bdf8,#1e40af)",
+   facts:{Field:"~60",Weather:"−10 to −20°C",Course:"Snow, at altitude",Success:"Limited places"},
+   blurb:"The seventh continent — the hardest box to tick. Tiny field, flights via Chile, book years ahead.",
+   steps:["Reserve a place & pay deposit","Fly from Punta Arenas, Chile","Cold-weather training essential","Completes the Seven Continents"]},
+
+  {id:"rio", name:"Rio de Janeiro Marathon", city:"Rio de Janeiro", country:"Brazil", flag:"🇧🇷", region:"South America",
+   cats:["seven","iconic"], major:"", dist:"Marathon", date:"2026-06-21",
+   method:"General", status:"open", ballotOpen:"2025-11-01", ballotClose:"2026-05-01", result:"—",
+   price:"R$390", grad:"linear-gradient(135deg,#22c55e,#15803d)",
+   facts:{Field:"~35,000",Weather:"18–26°C",Course:"Coastal, flat, ocean views",Success:"General entry"},
+   blurb:"A scenic coastal course covering the South America continent, run along Rio's famous beaches.",
+   steps:["Register online — general entry","Early-bird pricing tiers","Covers South America","Combine with Rio sightseeing"]},
+
+  {id:"dis", name:"Walt Disney World Marathon", city:"Orlando", country:"United States", flag:"🇺🇸", region:"North America",
+   cats:["disney","iconic"], major:"", dist:"Marathon Weekend", date:"2027-01-10",
+   method:"General", status:"open", ballotOpen:"2026-04-01", ballotClose:"2026-11-01", result:"—",
+   price:"$220", grad:"linear-gradient(135deg,#ec4899,#a21caf)",
+   facts:{Field:"~20,000",Weather:"8–22°C",Course:"Through all four parks",Success:"Sells out fast"},
+   blurb:"The original Disney runDisney weekend — 5K, 10K, half and full through the parks. Chase the Goofy & Dopey Challenges.",
+   steps:["Register when entries open (spring)","Popular races sell out in minutes","Stack races for Goofy/Dopey medals","Book park tickets separately"]},
+
+  {id:"dpl", name:"Disneyland Paris Run Weekend", city:"Paris", country:"France", flag:"🇫🇷", region:"Europe",
+   cats:["disney","europe"], major:"", dist:"Half / 5K / 10K", date:"2026-09-19",
+   method:"General", status:"soon", ballotOpen:"2026-05-01", ballotClose:"2026-08-01", result:"—",
+   price:"€99", grad:"linear-gradient(135deg,#d946ef,#6b21a8)",
+   facts:{Field:"~15,000",Weather:"12–20°C",Course:"Through the Disney parks",Success:"Sells out"},
+   blurb:"Europe's runDisney weekend — themed races through Disneyland Paris with character stops and castle finishes.",
+   steps:["Registration opens in spring","Half-marathon challenge medal","Character photo stops en route","Park entry usually included"]},
+
+  {id:"utmb", name:"UTMB Mont-Blanc", city:"Chamonix", country:"France", flag:"🇫🇷", region:"Europe",
+   cats:["trail","europe"], major:"", dist:"171 km / 10,000 m+", date:"2026-08-28",
+   method:"Qualification", status:"soon", ballotOpen:"2025-12-15", ballotClose:"2026-01-10", result:"2026-01",
+   price:"€380", grad:"linear-gradient(135deg,#7c3aed,#4c1d95)",
+   facts:{Field:"~2,900",Weather:"Alpine, variable",Course:"Loop of Mont Blanc",Success:"Points + lottery"},
+   blurb:"The world's most prestigious ultra-trail. Earn Running Stones through qualifying races, then enter the lottery.",
+   steps:["Earn Running Stones at UTMB events","Enter the lottery (Dec–Jan)","More stones = better odds","Draw results in January"]},
+
+  {id:"com", name:"Comrades Marathon", city:"Durban ↔ Pietermaritzburg", country:"South Africa", flag:"🇿🇦", region:"Africa",
+   cats:["trail","iconic"], major:"", dist:"~90 km ultra", date:"2026-06-14",
+   method:"General", status:"open", ballotOpen:"2025-09-01", ballotClose:"2026-04-30", result:"—",
+   price:"R1,500", grad:"linear-gradient(135deg,#84cc16,#4d7c0f)",
+   facts:{Field:"~20,000",Weather:"10–24°C",Course:"Up/down run alternates",Success:"Qualifier + entry"},
+   blurb:"The world's oldest and largest ultramarathon. Requires a qualifying marathon within the cutoff to enter.",
+   steps:["Run a qualifying marathon first","Register before the cap fills","Strict 12-hour cutoff","Alternates 'up' and 'down' runs yearly"]},
+];
+
+/* ============ State ============ */
+const store = {
+  get home(){ try{return JSON.parse(localStorage.getItem('rr_home'))}catch(e){return null} },
+  set home(v){ localStorage.setItem('rr_home', JSON.stringify(v)) },
+  get watch(){ try{return JSON.parse(localStorage.getItem('rr_watch'))||[]}catch(e){return []} },
+  set watch(v){ localStorage.setItem('rr_watch', JSON.stringify(v)) },
+  get pro(){ return localStorage.getItem('rr_pro')==='1' },
+  set pro(v){ localStorage.setItem('rr_pro', v?'1':'0') },
+};
+let ui = { cat:null, tab:'all', q:'', sort:'deadline' };
+
+const countries = [...new Set(EVENTS.map(e=>e.country))].sort();
+const regions = [...new Set(EVENTS.map(e=>e.region))].sort();
+
+/* ============ Helpers ============ */
+const $ = s=>document.querySelector(s);
+const fmtDate = iso => {
+  if(!iso||iso==='—'||iso.length<7) return iso||'TBC';
+  const [y,m,d] = iso.split('-');
+  const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m-1];
+  return d ? `${+d} ${mo} ${y}` : `${mo} ${y}`;
+};
+const daysUntil = iso => {
+  if(!iso||iso==='—') return null;
+  const t = new Date(iso+'T00:00:00'), now = new Date();
+  return Math.ceil((t-now)/86400000);
+};
+function statusInfo(e){
+  const d = daysUntil(e.ballotClose);
+  if(e.status==='live') return {cls:'s-live',label:'Ballot open now',live:true};
+  if(e.status==='open'){
+    if(d!=null && d>0 && d<=30) return {cls:'s-live',label:`Closes in ${d} day${d>1?'s':''}`,live:true};
+    return {cls:'s-open',label:'Entries open'};
+  }
+  if(e.status==='soon') return {cls:'s-soon',label:'Opening soon'};
+  return {cls:'s-closed',label:'Ballot closed'};
+}
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1900); }
+
+/* ============ Render: categories ============ */
+function renderRail(){
+  const rail = $('#rail');
+  rail.innerHTML = CATEGORIES.map(c=>{
+    const n = EVENTS.filter(e=>e.cats.includes(c.id)).length;
+    return `<button class="cat ${ui.cat===c.id?'on':''}" data-cat="${c.id}">
+      <div class="emoji">${c.emoji}</div>
+      <div class="t">${c.name}</div>
+      <div class="n">${n} races</div>
+    </button>`;
+  }).join('');
+  rail.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{
+    ui.cat = ui.cat===b.dataset.cat ? null : b.dataset.cat; renderRail(); renderGrid();
+  });
+}
+
+/* ============ Filtering ============ */
+function filtered(){
+  let list = EVENTS.slice();
+  const home = store.home;
+  if(ui.cat) list = list.filter(e=>e.cats.includes(ui.cat));
+  if(ui.tab==='near' && home) list = list.filter(e=>e.country===home.country || e.region===home.interest || e.country===home.interest);
+  if(ui.tab==='ballot') list = list.filter(e=>e.method==='Ballot');
+  if(ui.tab==='open') list = list.filter(e=>e.status==='open'||e.status==='live');
+  if(ui.tab==='watch') list = list.filter(e=>store.watch.includes(e.id));
+  if(ui.q){
+    const q = ui.q.toLowerCase();
+    list = list.filter(e=>[e.name,e.city,e.country,e.region,e.dist,e.method].join(' ').toLowerCase().includes(q)
+      || e.cats.some(c=>CATEGORIES.find(x=>x.id===c).name.toLowerCase().includes(q)));
+  }
+  list.sort((a,b)=>{
+    if(ui.sort==='name') return a.name.localeCompare(b.name);
+    if(ui.sort==='date') return (a.date||'').localeCompare(b.date||'');
+    // deadline: open/soon with nearest close first, closed last
+    const rank = e => (e.status==='closed'?1e9:0);
+    const da = daysUntil(a.ballotClose), db = daysUntil(b.ballotClose);
+    return (rank(a)+(da==null||da<0?9e8:da)) - (rank(b)+(db==null||db<0?9e8:db));
+  });
+  return list;
+}
+
+/* ============ Render: grid ============ */
+function renderGrid(){
+  const list = filtered();
+  const grid = $('#grid'), empty = $('#empty');
+  $('#count').textContent = `${list.length} race${list.length!==1?'s':''}`;
+  $('#watchCount').textContent = store.watch.length;
+  empty.hidden = list.length>0;
+  grid.innerHTML = list.map(e=>{
+    const s = statusInfo(e);
+    const watching = store.watch.includes(e.id);
+    const d = daysUntil(e.ballotClose);
+    let deadline;
+    if(e.status==='closed') deadline = `Ballot reopens ${fmtDate(e.ballotOpen)}`;
+    else if(e.status==='soon') deadline = `Opens <b>${fmtDate(e.ballotOpen)}</b>`;
+    else if(d!=null && d>0) deadline = `Closes <b>${fmtDate(e.ballotClose)}</b> · ${d}d left`;
+    else deadline = `Open until <b>${fmtDate(e.ballotClose)}</b>`;
+    return `<article class="card">
+      <div class="banner" style="background:${e.grad}">
+        <span class="flag">${e.flag}</span>
+        ${e.major?`<span class="maj">${e.major}</span>`:''}
+        <h3>${e.name}</h3>
+      </div>
+      <div class="body">
+        <div class="where">📍 ${e.city}, ${e.country}</div>
+        <span class="status ${s.cls}">${s.live?'<span class="pulse"></span>':''}${s.label}</span>
+        <div class="meta">
+          <span class="tag">${e.dist}</span>
+          <span class="tag">${e.method}</span>
+          <span class="tag">🗓 ${fmtDate(e.date)}</span>
+        </div>
+        <div class="deadline">${deadline}</div>
+        <div class="row">
+          <button class="watch ${watching?'on':''}" data-watch="${e.id}">${watching?'★ Watching':'☆ Watch'}</button>
+          <button class="details" data-open="${e.id}">Details & how to enter</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+  grid.querySelectorAll('[data-watch]').forEach(b=>b.onclick=()=>toggleWatch(b.dataset.watch));
+  grid.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openModal(b.dataset.open));
+}
+
+function toggleWatch(id){
+  const w = store.watch;
+  const i = w.indexOf(id);
+  if(i>=0){ w.splice(i,1); toast('Removed from watchlist'); }
+  else { w.push(id); toast('Added — we\'ll flag its ballot ✔'); }
+  store.watch = w; renderGrid();
+}
+
+/* ============ Modal ============ */
+function openModal(id){
+  const e = EVENTS.find(x=>x.id===id); if(!e) return;
+  const s = statusInfo(e);
+  const watching = store.watch.includes(e.id);
+  const facts = Object.entries(e.facts).map(([k,v])=>`<div class="fact"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  const steps = e.steps.map((t,i)=>`<li><span class="num">${i+1}</span><span>${t}</span></li>`).join('');
+  const proBlock = store.pro
+    ? `<div class="facts">
+         <div class="fact"><div class="k">Est. acceptance odds</div><div class="v">${e.facts.Success}</div></div>
+         <div class="fact"><div class="k">Best alternative route</div><div class="v">${e.method==='Ballot'?'Charity / GFA':'Book early'}</div></div>
+       </div>`
+    : `<div class="locked">
+         <div class="lk">🔒</div>
+         <h5>Acceptance odds & backdoor entry routes</h5>
+         <p>See historical ballot success rates and the fastest guaranteed-entry alternatives.</p>
+         <div class="facts blurred">
+           <div class="fact"><div class="k">Est. odds</div><div class="v">██ %</div></div>
+           <div class="fact"><div class="k">Backdoor</div><div class="v">████████</div></div>
+         </div>
+         <button class="cta" id="unlockPro" style="margin-top:12px">✦ Unlock with Pro</button>
+       </div>`;
+  $('#sheet').innerHTML = `
+    <div class="m-banner" style="background:${e.grad}">
+      <button class="m-close" data-close>×</button>
+      <h2>${e.flag} ${e.name}</h2>
+    </div>
+    <div class="m-body">
+      <span class="status ${s.cls}">${s.live?'<span class="pulse"></span>':''}${s.label}</span>
+      <p style="color:var(--ink-soft);margin:12px 0 0">${e.blurb}</p>
+
+      <h4>At a glance</h4>
+      <div class="facts">${facts}</div>
+
+      <h4>Key dates</h4>
+      <div class="facts">
+        <div class="fact"><div class="k">Race day</div><div class="v">${fmtDate(e.date)}</div></div>
+        <div class="fact"><div class="k">Entry / ballot opens</div><div class="v">${fmtDate(e.ballotOpen)}</div></div>
+        <div class="fact"><div class="k">Closes</div><div class="v">${fmtDate(e.ballotClose)}</div></div>
+        <div class="fact"><div class="k">Entry fee</div><div class="v">${e.price}</div></div>
+      </div>
+
+      <h4>How to get in</h4>
+      <ul class="steps">${steps}</ul>
+
+      <h4>Pro insight</h4>
+      ${proBlock}
+
+      <div class="row" style="margin-top:18px">
+        <button class="watch ${watching?'on':''}" id="mWatch">${watching?'★ Watching':'☆ Watch this ballot'}</button>
+        <button class="details" id="mLink">Open official site ↗</button>
+      </div>
+    </div>`;
+  $('#modal').classList.add('show');
+  document.body.style.overflow='hidden';
+  const mw = $('#mWatch'); if(mw) mw.onclick=()=>{ toggleWatch(e.id); openModal(e.id); };
+  const ml = $('#mLink'); if(ml) ml.onclick=()=>toast('Prototype — would open the official race page');
+  const up = $('#unlockPro'); if(up) up.onclick=()=>openPro();
+}
+function closeModal(){ $('#modal').classList.remove('show'); document.body.style.overflow=''; }
+
+/* ============ Location dialog ============ */
+function fillLocationDialog(){
+  const home = store.home;
+  $('#homeCountry').innerHTML = countries.map(c=>`<option ${home&&home.country===c?'selected':''}>${c}</option>`).join('');
+  const interests = [...regions, ...countries];
+  $('#homeInterest').innerHTML = `<option value="">— optional —</option>` +
+    interests.map(r=>`<option ${home&&home.interest===r?'selected':''}>${r}</option>`).join('');
+}
+function openLoc(){ fillLocationDialog(); $('#locDlg').classList.add('show'); }
+function saveLoc(){
+  store.home = { country:$('#homeCountry').value, interest:$('#homeInterest').value };
+  $('#locDlg').classList.remove('show');
+  refreshHomeLabel(); toast('Home set — showing races near you'); renderGrid();
+}
+function refreshHomeLabel(){
+  const home = store.home;
+  $('#locLabel').innerHTML = home ? `<b>${home.country}</b>` : 'Set home';
+  if(home) $('#heroSub').textContent = `Showing what's near ${home.country}${home.interest?` and ${home.interest}`:''} — plus every Major, Disney weekend and Seven-Continents race worldwide.`;
+}
+
+/* ============ Pro dialog ============ */
+function openPro(){ closeModal(); $('#proDlg').classList.add('show'); }
+function startPro(){ store.pro=true; $('#proDlg').classList.remove('show'); toast('Pro trial started ✦ premium unlocked'); renderGrid(); }
+
+/* ============ Wire up ============ */
+$('#search').addEventListener('input', e=>{ ui.q=e.target.value.trim(); renderGrid(); });
+$('#sort').addEventListener('change', e=>{ ui.sort=e.target.value; renderGrid(); });
+document.querySelectorAll('.chip.tab').forEach(b=>b.onclick=()=>{
+  if(b.dataset.tab==='near' && !store.home){ openLoc(); return; }
+  ui.tab=b.dataset.tab;
+  document.querySelectorAll('.chip.tab').forEach(x=>x.classList.toggle('on',x===b));
+  renderGrid();
+});
+$('#locBtn').onclick=openLoc;
+$('#watchTab').onclick=()=>{ document.querySelector('[data-tab="watch"]').click(); };
+$('#proBtn').onclick=()=>$('#proDlg').classList.add('show');
+$('#saveLoc').onclick=saveLoc;
+$('#startPro').onclick=startPro;
+document.querySelectorAll('[data-close]').forEach(el=>el.onclick=()=>{
+  closeModal(); $('#locDlg').classList.remove('show'); $('#proDlg').classList.remove('show');
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); $('#locDlg').classList.remove('show'); $('#proDlg').classList.remove('show'); }});
+
+/* ============ Init ============ */
+renderRail();
+refreshHomeLabel();
+renderGrid();
+</script>
+</body>
+</html>
