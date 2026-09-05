@@ -1,0 +1,206 @@
+{
+  "generatedAt": "2026-09-05",
+  "note": "Real, researched race data. Forward ballot windows marked provisional:true are estimates based on prior-year patterns — always confirm on the official race site. This file is the source of truth: scripts/scrape.mjs regenerates it from live sources where network egress allows.",
+  "sources": ["abbott", "utmb", "thairun", "ahotu", "raceroster", "web-research"],
+  "categories": [
+    {"id": "major",  "emoji": "🏅", "name": "World Majors"},
+    {"id": "europe", "emoji": "🇪🇺", "name": "European"},
+    {"id": "seven",  "emoji": "🌍", "name": "Seven Continents"},
+    {"id": "disney", "emoji": "🏰", "name": "Disney Races"},
+    {"id": "trail",  "emoji": "⛰️", "name": "Trail & Ultra"},
+    {"id": "thai",   "emoji": "🇹🇭", "name": "Thailand"},
+    {"id": "iconic", "emoji": "✨", "name": "Iconic City"}
+  ],
+  "events": [
+    {
+      "id": "tokyo-2027", "name": "Tokyo Marathon 2027", "city": "Tokyo", "country": "Japan", "flag": "🇯🇵", "region": "Asia",
+      "cats": ["major", "seven"], "major": "MAJOR", "dist": "Marathon", "date": "2027-03-07",
+      "method": "Ballot", "ballotOpen": "2026-08-17", "ballotClose": "2026-08-31", "result": "2026-09", "provisional": true,
+      "price": "¥26,000", "grad": "linear-gradient(135deg,#ef4444,#991b1b)",
+      "facts": {"Field": "~38,000", "Weather": "6–12°C", "Course": "Flat, superb support", "Success": "~10% ballot odds"},
+      "blurb": "The most orderly Major, run through the heart of Tokyo. The general ballot usually opens in mid-August; premium 'RUN as ONE' charity places guarantee entry.",
+      "steps": ["Enter the general ballot (usually mid-August)", "Draw results announced in September", "Charity & premium guaranteed entries available", "One-time 'Run with Heart' donation route"],
+      "source": "abbott", "official": "https://www.marathon.tokyo/en/"
+    },
+    {
+      "id": "boston-2027", "name": "Boston Marathon 2027", "city": "Boston", "country": "United States", "flag": "🇺🇸", "region": "North America",
+      "cats": ["major"], "major": "MAJOR", "dist": "Marathon", "date": "2027-04-19",
+      "method": "Qualification", "ballotOpen": "2026-09-07", "ballotClose": "2026-09-11", "result": "2026-09", "provisional": true,
+      "price": "$250", "grad": "linear-gradient(135deg,#1d4ed8,#1e3a8a)",
+      "facts": {"Field": "~30,000", "Weather": "7–13°C", "Course": "Net downhill, tough hills", "Success": "Time-qualified only"},
+      "blurb": "The oldest annual marathon — no ballot. You earn your place with a certified qualifying time, and standards get faster every year.",
+      "steps": ["Run a certified qualifying time first", "Register during the September window", "Fastest qualifiers get priority", "Charity bibs are the non-qualifying route"],
+      "source": "abbott", "official": "https://www.baa.org/"
+    },
+    {
+      "id": "london-2027", "name": "London Marathon 2027", "city": "London", "country": "United Kingdom", "flag": "🇬🇧", "region": "Europe",
+      "cats": ["major", "europe"], "major": "MAJOR", "dist": "Marathon", "date": "2027-04-25",
+      "method": "Ballot", "ballotOpen": "2026-04-27", "ballotClose": "2026-05-01", "result": "2026-07", "provisional": true,
+      "price": "£79.99", "grad": "linear-gradient(135deg,#e11d48,#7c1d3f)",
+      "facts": {"Field": "~56,000", "Weather": "9–14°C, mild", "Course": "Flat, fast, PB-friendly", "Success": "~4% ballot odds"},
+      "blurb": "The world's largest marathon and the hardest Major ballot to win. The public ballot for the next year opens the week after race day, so set a reminder.",
+      "steps": ["Enter the public ballot the week after race day", "Or secure a charity place (~£2,000 fundraising)", "Good-for-Age & Championship entries for fast times", "Result emails ~10 weeks later"],
+      "source": "abbott", "official": "https://www.londonmarathonevents.co.uk/"
+    },
+    {
+      "id": "sydney-2027", "name": "Sydney Marathon 2027", "city": "Sydney", "country": "Australia", "flag": "🇦🇺", "region": "Oceania",
+      "cats": ["major", "seven"], "major": "MAJOR", "dist": "Marathon", "date": "2027-08-29",
+      "method": "Ballot", "ballotOpen": "2026-09-24", "ballotClose": "2026-10-17", "result": "2026-11", "provisional": true,
+      "price": "A$225", "grad": "linear-gradient(135deg,#14b8a6,#0f766e)",
+      "facts": {"Field": "~35,000", "Weather": "11–19°C", "Course": "Harbour Bridge to Opera House", "Success": "~50% ballot odds"},
+      "blurb": "The newest Abbott World Marathon Major. Demand is climbing fast now that it counts toward the Six/Seven Star medal — enter the ballot early.",
+      "steps": ["Enter the ballot (usually late September)", "Time-qualifier registration runs alongside", "Also ticks the Oceania continent", "Charity & travel packages available"],
+      "source": "abbott", "official": "https://www.sydneymarathon.com/"
+    },
+    {
+      "id": "berlin-2027", "name": "Berlin Marathon 2027", "city": "Berlin", "country": "Germany", "flag": "🇩🇪", "region": "Europe",
+      "cats": ["major", "europe"], "major": "MAJOR", "dist": "Marathon", "date": "2027-09-26",
+      "method": "Ballot", "ballotOpen": "2026-09-25", "ballotClose": "2026-11-06", "result": "2027-01", "provisional": true,
+      "price": "€198", "grad": "linear-gradient(135deg,#f59e0b,#b45309)",
+      "facts": {"Field": "~55,000", "Weather": "12–18°C", "Course": "Flattest Major — WR course", "Success": "~15% ballot odds"},
+      "blurb": "The fastest marathon course on earth and home to the world record. The lottery is your best-value shot at a Major.",
+      "steps": ["Register for the lottery (opens late September)", "Draw held after the window closes", "Guaranteed entry via sub-2:45 (M)/3:00 (F) times", "Travel & charity slots also available"],
+      "source": "abbott", "official": "https://www.bmw-berlin-marathon.com/en/"
+    },
+    {
+      "id": "chicago-2027", "name": "Chicago Marathon 2027", "city": "Chicago", "country": "United States", "flag": "🇺🇸", "region": "North America",
+      "cats": ["major"], "major": "MAJOR", "dist": "Marathon", "date": "2027-10-10",
+      "method": "Ballot", "ballotOpen": "2026-10-27", "ballotClose": "2026-11-19", "result": "2026-12", "provisional": true,
+      "price": "$255", "grad": "linear-gradient(135deg,#0ea5e9,#0369a1)",
+      "facts": {"Field": "~52,000", "Weather": "5–13°C", "Course": "Flat & fast, loop course", "Success": "~25% drawing odds"},
+      "blurb": "A flat, spectator-packed Major with a relatively friendly drawing. Time-qualification and guaranteed-entry options exist too.",
+      "steps": ["Enter the drawing (usually late Oct–Nov)", "Non-guaranteed applicants drawn in December", "Guaranteed via time standard or legacy status", "Charity and tour operator places available"],
+      "source": "abbott", "official": "https://www.chicagomarathon.com/"
+    },
+    {
+      "id": "nyc-2027", "name": "New York City Marathon 2027", "city": "New York", "country": "United States", "flag": "🇺🇸", "region": "North America",
+      "cats": ["major", "seven"], "major": "MAJOR", "dist": "Marathon", "date": "2027-11-07",
+      "method": "Ballot", "ballotOpen": "2027-02-01", "ballotClose": "2027-02-28", "result": "2027-03", "provisional": true,
+      "price": "$325", "grad": "linear-gradient(135deg,#6366f1,#3730a3)",
+      "facts": {"Field": "~55,000", "Weather": "6–12°C", "Course": "Five boroughs, rolling bridges", "Success": "~3% drawing odds"},
+      "blurb": "The biggest marathon in the US and a bucket-list Major. The drawing opens early in the year; the NYRR 9+1 route guarantees entry.",
+      "steps": ["Enter the drawing (usually February)", "Or complete NYRR 9+1 for guaranteed entry", "Time-qualify with fast standards", "Charity & international tour packages"],
+      "source": "abbott", "official": "https://www.nyrr.org/tcsnycmarathon"
+    },
+    {
+      "id": "capetown-2027", "name": "Cape Town Marathon 2027", "city": "Cape Town", "country": "South Africa", "flag": "🇿🇦", "region": "Africa",
+      "cats": ["seven", "iconic"], "major": "CANDIDATE", "dist": "Marathon", "date": "2027-05-23",
+      "method": "General", "ballotOpen": "2026-11-06", "ballotClose": "2027-04-01", "result": "—", "provisional": true,
+      "price": "R950", "grad": "linear-gradient(135deg,#f97316,#c2410c)",
+      "facts": {"Field": "~22,000", "Weather": "12–22°C", "Course": "Flat, Table Mountain views", "Success": "General / ballot mix"},
+      "blurb": "Africa's premier flat marathon and an Abbott candidate race under assessment for full Major status — a Seven Continents favourite.",
+      "steps": ["Register / enter the ballot when it opens", "Add-on hospitality & tours", "Ticks the Africa continent box", "Pair with a safari or wine-country week"],
+      "source": "ahotu", "official": "https://www.capetownmarathon.com/"
+    },
+    {
+      "id": "wdw-2027", "name": "WDW Marathon Weekend 2027", "city": "Orlando", "country": "United States", "flag": "🇺🇸", "region": "North America",
+      "cats": ["disney", "iconic"], "major": "", "dist": "5K / 10K / Half / Full", "date": "2027-01-10",
+      "method": "General", "ballotOpen": "2026-03-17", "ballotClose": "2026-07-01", "result": "—", "provisional": false,
+      "price": "$220", "grad": "linear-gradient(135deg,#ec4899,#a21caf)",
+      "facts": {"Field": "~20,000", "Weather": "8–22°C", "Course": "Through all four parks", "Success": "Sells out fast"},
+      "blurb": "The original runDisney weekend (Jan 6–10, 2027) marks the 30th anniversary of the WDW Half. Chase the Goofy (Half+Full) and Dopey (all four) Challenges.",
+      "steps": ["General registration opened 17 Mar 2026", "Club runDisney members get early access", "Popular races sell out in minutes", "Stack races for Goofy/Dopey medals"],
+      "source": "raceroster", "official": "https://www.rundisney.com/events/disneyworld/disneyworld-marathon-weekend"
+    },
+    {
+      "id": "disney-winedine-2026", "name": "Disney Wine & Dine Half Weekend 2026", "city": "Orlando", "country": "United States", "flag": "🇺🇸", "region": "North America",
+      "cats": ["disney", "iconic"], "major": "", "dist": "5K / 10K / Half", "date": "2026-11-07",
+      "method": "General", "ballotOpen": "2026-05-19", "ballotClose": "2026-10-15", "result": "—", "provisional": true,
+      "price": "$185", "grad": "linear-gradient(135deg,#d946ef,#6b21a8)",
+      "facts": {"Field": "~15,000", "Weather": "16–28°C", "Course": "Epcot & Hollywood Studios", "Success": "Sells out"},
+      "blurb": "runDisney's autumn foodie weekend, finishing at EPCOT during the Food & Wine Festival. The Two Course Challenge stacks the 10K and Half.",
+      "steps": ["Register when entries open (spring)", "Club runDisney early access first", "Two Course Challenge = 10K + Half", "Park tickets booked separately"],
+      "source": "raceroster", "official": "https://www.rundisney.com/events/disneyworld/disneyworld-wine-dine-half-marathon-weekend"
+    },
+    {
+      "id": "utmb-2027", "name": "UTMB Mont-Blanc 2027", "city": "Chamonix", "country": "France", "flag": "🇫🇷", "region": "Europe",
+      "cats": ["trail", "europe"], "major": "", "dist": "171 km / 10,000 m+", "date": "2027-08-27",
+      "method": "Qualification", "ballotOpen": "2027-01-07", "ballotClose": "2027-01-18", "result": "2027-01", "provisional": true,
+      "price": "€380", "grad": "linear-gradient(135deg,#7c3aed,#4c1d95)",
+      "facts": {"Field": "~2,900", "Weather": "Alpine, variable", "Course": "Loop of Mont Blanc", "Success": "Running Stones + lottery"},
+      "blurb": "The world's most prestigious ultra-trail. Earn Running Stones at UTMB World Series events, then enter the January lottery — more stones improve your odds.",
+      "steps": ["Earn 1+ Running Stone in the past 2 years", "Pre-register in the January lottery window", "More stones = better draw odds", "Lottery results announced late January"],
+      "source": "utmb", "official": "https://montblanc.utmb.world/"
+    },
+    {
+      "id": "comrades-2027", "name": "Comrades Marathon 2027", "city": "Durban ↔ Pietermaritzburg", "country": "South Africa", "flag": "🇿🇦", "region": "Africa",
+      "cats": ["trail", "iconic"], "major": "", "dist": "~90 km ultra", "date": "2027-06-13",
+      "method": "Qualification", "ballotOpen": "2026-10-27", "ballotClose": "2026-11-26", "result": "—", "provisional": true,
+      "price": "R1,600", "grad": "linear-gradient(135deg,#84cc16,#4d7c0f)",
+      "facts": {"Field": "~22,000 cap", "Weather": "10–24°C", "Course": "'Up' / 'down' run alternates", "Success": "Qualifier + entry cap"},
+      "blurb": "The world's oldest and largest ultramarathon. Requires a sub-5:00 standard marathon to qualify, and the 22,000 entry cap fills before the window closes.",
+      "steps": ["Run a qualifying marathon (sub-5:00)", "Register early — the cap fills fast", "Strict 12-hour cutoff on race day", "Alternates 'up' and 'down' routes yearly"],
+      "source": "ahotu", "official": "https://www.comrades.com/"
+    },
+    {
+      "id": "twooceans-2027", "name": "Two Oceans Marathon 2027", "city": "Cape Town", "country": "South Africa", "flag": "🇿🇦", "region": "Africa",
+      "cats": ["trail", "iconic"], "major": "", "dist": "56 km ultra / Half", "date": "2027-04-03",
+      "method": "General", "ballotOpen": "2026-12-01", "ballotClose": "2027-03-01", "result": "—", "provisional": true,
+      "price": "R850", "grad": "linear-gradient(135deg,#0d9488,#115e59)",
+      "facts": {"Field": "~26,000", "Weather": "12–22°C", "Course": "'World's most beautiful' ultra", "Success": "First-come entry"},
+      "blurb": "A stunning 56 km ultra around the Cape Peninsula, plus a hugely popular half. Entries are first-come, so grab a place when they open.",
+      "steps": ["Register online when entries open", "Ultra needs a qualifying marathon time", "Half sells out quickly", "Pair with the Cape's wine country"],
+      "source": "ahotu", "official": "https://www.twooceansmarathon.org.za/"
+    },
+    {
+      "id": "antarctic-2026", "name": "Antarctic Ice Marathon 2026", "city": "Union Glacier", "country": "Antarctica", "flag": "🇦🇶", "region": "Antarctica",
+      "cats": ["seven", "trail"], "major": "", "dist": "Marathon / Half", "date": "2026-12-13",
+      "method": "General", "ballotOpen": "2025-01-01", "ballotClose": "2026-10-01", "result": "—", "provisional": true,
+      "price": "€21,500", "grad": "linear-gradient(135deg,#38bdf8,#1e40af)",
+      "facts": {"Field": "~60", "Weather": "−10 to −20°C", "Course": "Snow, at altitude", "Success": "Very limited places"},
+      "blurb": "The seventh continent — the hardest box to tick. Tiny field, flights via Punta Arenas in Chile, and places book years ahead.",
+      "steps": ["Reserve a place & pay the deposit early", "Fly from Punta Arenas, Chile", "Cold-weather training is essential", "Completes the Seven Continents challenge"],
+      "source": "ahotu", "official": "https://icemarathon.com/"
+    },
+    {
+      "id": "greatwall-2027", "name": "Great Wall Marathon 2027", "city": "Tianjin", "country": "China", "flag": "🇨🇳", "region": "Asia",
+      "cats": ["seven", "iconic"], "major": "", "dist": "Marathon / Half / 8.5K", "date": "2027-05-15",
+      "method": "General", "ballotOpen": "2026-05-01", "ballotClose": "2027-04-15", "result": "—", "provisional": true,
+      "price": "$180", "grad": "linear-gradient(135deg,#dc2626,#7f1d1d)",
+      "facts": {"Field": "~2,500", "Weather": "18–28°C", "Course": "5,164 steps on the Wall", "Success": "General / tour entry"},
+      "blurb": "One of the world's toughest and most iconic marathons — thousands of stone steps along the Great Wall. Usually entered via an official travel package.",
+      "steps": ["Book via an official tour operator", "Or take a limited independent entry", "Train on stairs and hills", "A memorable Asia-continent option"],
+      "source": "ahotu", "official": "https://great-wall-marathon.com/"
+    },
+    {
+      "id": "rio-2027", "name": "Rio de Janeiro Marathon 2027", "city": "Rio de Janeiro", "country": "Brazil", "flag": "🇧🇷", "region": "South America",
+      "cats": ["seven", "iconic"], "major": "", "dist": "Marathon / Half / 10K", "date": "2027-06-20",
+      "method": "General", "ballotOpen": "2026-08-01", "ballotClose": "2027-05-01", "result": "—", "provisional": true,
+      "price": "R$390", "grad": "linear-gradient(135deg,#22c55e,#15803d)",
+      "facts": {"Field": "~35,000", "Weather": "18–26°C", "Course": "Coastal, flat, ocean views", "Success": "General entry"},
+      "blurb": "A scenic coastal course along Rio's famous beaches — a great way to tick off the South America continent.",
+      "steps": ["Register online — general entry", "Early-bird pricing tiers", "Covers the South America continent", "Combine with Rio sightseeing"],
+      "source": "ahotu", "official": "https://www.maratonadorio.com.br/"
+    },
+    {
+      "id": "amazing-thailand-2026", "name": "Amazing Thailand Marathon Bangkok 2026", "city": "Bangkok", "country": "Thailand", "flag": "🇹🇭", "region": "Asia",
+      "cats": ["thai", "iconic"], "major": "", "dist": "Marathon / Half / 10K", "date": "2026-11-29",
+      "method": "General", "ballotOpen": "2026-06-01", "ballotClose": "2026-11-01", "result": "—", "provisional": true,
+      "price": "฿1,500", "grad": "linear-gradient(135deg,#0891b2,#155e75)",
+      "facts": {"Field": "~20,000", "Weather": "24–32°C, humid", "Course": "Flat, past Bangkok landmarks", "Success": "General entry"},
+      "blurb": "Thailand's flagship international marathon, starting at Sanam Luang. Half on Sat 28 Nov, full/mini/family on Sun 29 Nov 2026.",
+      "steps": ["Register online via thai.run", "Choose your distance and wave", "Start early to beat the heat", "Great intro to running in Thailand"],
+      "source": "thairun", "official": "https://thai.run/"
+    },
+    {
+      "id": "buriram-2027", "name": "Buriram Marathon 2027", "city": "Buriram", "country": "Thailand", "flag": "🇹🇭", "region": "Asia",
+      "cats": ["thai"], "major": "", "dist": "Marathon / Half / 10K / 5K", "date": "2027-02-07",
+      "method": "General", "ballotOpen": "2026-10-01", "ballotClose": "2027-01-20", "result": "—", "provisional": true,
+      "price": "฿900", "grad": "linear-gradient(135deg,#f43f5e,#9f1239)",
+      "facts": {"Field": "~15,000", "Weather": "20–30°C", "Course": "Chang International Circuit", "Success": "General entry"},
+      "blurb": "A fast, festive marathon run on and around the Chang International Circuit — one of Thailand's most popular road races.",
+      "steps": ["Register online via thai.run", "Pick your distance", "Cooler February timing", "Motorsport-meets-running atmosphere"],
+      "source": "thairun", "official": "https://thai.run/"
+    },
+    {
+      "id": "chiangmai-2026", "name": "Muang Thai Chiang Mai Marathon 2026", "city": "Chiang Mai", "country": "Thailand", "flag": "🇹🇭", "region": "Asia",
+      "cats": ["thai", "iconic"], "major": "", "dist": "Marathon / Half / 10K", "date": "2026-12-20",
+      "method": "General", "ballotOpen": "2026-08-01", "ballotClose": "2026-12-01", "result": "—", "provisional": true,
+      "price": "฿1,000", "grad": "linear-gradient(135deg,#65a30d,#3f6212)",
+      "facts": {"Field": "~12,000", "Weather": "15–28°C", "Course": "Old-city temples & moat", "Success": "General entry"},
+      "blurb": "A scenic late-December marathon through Chiang Mai's historic old city, with cool northern-Thailand mornings.",
+      "steps": ["Register online via thai.run", "Choose your distance", "Enjoy cool northern weather", "Explore the old city afterwards"],
+      "source": "thairun", "official": "https://thai.run/"
+    }
+  ]
+}

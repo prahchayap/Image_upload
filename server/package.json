@@ -1,0 +1,14 @@
+{
+  "name": "raceradar-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Static host + Web Push server for the RaceRadar PWA",
+  "scripts": {
+    "start": "node server.mjs",
+    "gen-vapid": "web-push generate-vapid-keys"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

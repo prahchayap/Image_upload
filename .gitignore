@@ -1,0 +1,11 @@
+# Generated / staging artifacts
+scripts/scraped.json
+
+# Server runtime
+server/node_modules/
+server/subscriptions.json
+server/.env
+
+# OS / editor
+.DS_Store
+*.log
